@@ -26,21 +26,15 @@ include('product-details.php');
             <p><strong>Количество на складе:</strong> <span id="stock"><?php echo $product['quantity_in_stock']; ?></span></p>
             <img src="<?php echo htmlspecialchars($product['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8'); ?>">
 
-            <div class="btn-container">
-                <button class="size-btn-group size-btn-group-50x70 active" onclick="toggleSizeGroup('50x70')">50*70</button>
-                <button class="size-btn-group size-btn-group-70x70" onclick="toggleSizeGroup('70x70')">70*70</button>
-            </div>
-
             <form action="cart.php" method="post">
                 <h4>Выберите размер комплекта:</h4>
                 <div class="size-groups">
                     <?php
                     foreach ($sizes as $group_id => $group_sizes) :
                         foreach ($group_sizes as $data) :
-                            // Очищаем размер от всего ненужного
-                            $size = preg_replace('/\s*\(арт\d+\)/i', '', $data['size']); // убираем артикул
-                            $size = preg_replace('/\b50\*70\b|\b70\*70\b/', '', $size); // убираем размеры
-                            $size = trim($size); // убираем пробелы
+                            $size = preg_replace('/\s*\(арт\d+\)/i', '', $data['size']);
+                            $size = preg_replace('/\b50\*70\b|\b70\*70\b/', '', $size);
+                            $size = trim($size);
 
                             if (strpos($data['size'], '50*70') !== false) {
                                 ?>
@@ -74,8 +68,15 @@ include('product-details.php');
                     ?>
                 </div>
 
-                <input type="hidden" name="product_id" value="<?php echo $product_id; ?>">
-                <button type="submit">Добавить в корзину</button>
+                <!-- Добавляем надпись и кнопки выбора размеров -->
+                <h4>Выбор размера наволочек:</h4>
+                <div class="btn-container">
+                    <button class="size-btn-group size-btn-group-50x70" type="button" onclick="toggleSizeGroup('50x70')">50*70</button>
+                    <button class="size-btn-group size-btn-group-70x70" type="button" onclick="toggleSizeGroup('70x70')">70*70</button>
+                </div>
+
+                <!-- Кнопка добавления в корзину теперь внизу -->
+                <button type="submit" class="add-to-cart-btn">Добавить в корзину</button>
             </form>
         </div>
     </section>
