@@ -25,7 +25,8 @@
                     die("Ошибка подключения: " . $mysqli->connect_error);
                 }
 
-                $query = "SELECT * FROM categories";
+                // Запрос для получения всех категорий, кроме исключенных
+                $query = "SELECT * FROM categories WHERE name NOT IN ('Неизвестная категория', 'Півтора-спальний', 'Двоспальний', 'Євро', 'Сімейний', 'Індивідуальний пошив', 'Іедивідуальний пошив')";
                 $result = $mysqli->query($query);
 
                 if ($result->num_rows > 0) {
