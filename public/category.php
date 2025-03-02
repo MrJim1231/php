@@ -51,13 +51,24 @@ $category = $category_result->fetch_assoc();
     <main>
         <section class="category-products">
             <?php
+            // Массив для хранения уже выведенных товаров
+            $displayed_products = [];
+
             // Проверка, есть ли товары в выбранной категории или её подкатегориях
             if ($result->num_rows > 0) {
                 echo "<h2>Товары категории: " . htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8') . "</h2>";
                 echo "<div class='products-list'>";
-                
+
                 // Выводим товары
                 while ($product = $result->fetch_assoc()) {
+                    // Проверяем, был ли уже выведен товар с таким именем
+                    if (in_array($product['name'], $displayed_products)) {
+                        continue; // Пропускаем этот товар, если он уже был выведен
+                    }
+
+                    // Добавляем товар в массив выведенных товаров
+                    $displayed_products[] = $product['name'];
+
                     echo "<div class='product'>";
                     echo "<h3>" . htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8') . "</h3>";
                     echo "<p>" . htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8') . "</p>";
@@ -66,7 +77,7 @@ $category = $category_result->fetch_assoc();
                     echo "<a href='/myshop/public/product-details.php?id=" . $product['id'] . "' class='btn'>Подробнее</a>";
                     echo "</div>";
                 }
-                
+
                 echo "</div>";
             } else {
                 echo "<p>Товары не найдены для этой категории</p>";
