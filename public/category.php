@@ -13,8 +13,19 @@ if ($mysqli->connect_error) {
 // Получаем id категории из URL
 $category_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
-// Получаем товары, принадлежащие этой категории
-$query = "SELECT * FROM products WHERE category_id = $category_id";
+// Получаем все подкатегории для этой категории
+$subcategories_query = "SELECT id FROM categories WHERE parent_id = $category_id";
+$subcategories_result = $mysqli->query($subcategories_query);
+
+// Формируем список всех категорий, включая подкатегории
+$all_categories = [$category_id]; // Сначала добавляем выбранную категорию
+while ($subcategory = $subcategories_result->fetch_assoc()) {
+    $all_categories[] = $subcategory['id']; // Добавляем id подкатегорий
+}
+
+// Получаем товары, принадлежащие выбранной категории и её подкатегориям
+$categories_list = implode(',', $all_categories); // Преобразуем массив в строку для SQL-запроса
+$query = "SELECT * FROM products WHERE category_id IN ($categories_list)";
 $result = $mysqli->query($query);
 
 // Получаем информацию о категории
@@ -40,7 +51,7 @@ $category = $category_result->fetch_assoc();
     <main>
         <section class="category-products">
             <?php
-            // Проверка, есть ли товары в выбранной категории
+            // Проверка, есть ли товары в выбранной категории или её подкатегориях
             if ($result->num_rows > 0) {
                 echo "<h2>Товары категории: " . htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8') . "</h2>";
                 echo "<div class='products-list'>";
