@@ -14,7 +14,8 @@ if ($mysqli->connect_error) {
 $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 // Получаем информацию о товаре
-$query = "SELECT products.*, categories.name AS category_name, categories.parent_id FROM products
+$query = "SELECT products.*, categories.name AS category_name, categories.parent_id 
+          FROM products
           JOIN categories ON products.category_id = categories.id
           WHERE products.id = $product_id";
 $result = $mysqli->query($query);
@@ -64,6 +65,10 @@ $mysqli->close();
                 <p><strong>Категория:</strong> <?php echo isset($product['category_name']) ? htmlspecialchars($product['category_name'], ENT_QUOTES, 'UTF-8') : 'Категория не найдена'; ?></p>
                 <p><strong>Описание:</strong> <?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></p>
                 <p><strong>Цена:</strong> <?php echo number_format($product['price'], 2, '.', '') . " грн"; ?></p>
+                <p><strong>Размер:</strong> <?php echo htmlspecialchars($product['size'], ENT_QUOTES, 'UTF-8'); ?></p>
+                <p><strong>Наличие:</strong> <?php echo $product['availability'] ? 'В наличии' : 'Нет в наличии'; ?></p>
+                <p><strong>Количество на складе:</strong> <?php echo $product['quantity_in_stock']; ?></p>
+                <p><strong>Вес:</strong> <?php echo $product['weight'] . ' кг'; ?></p>
                 <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8'); ?>" />
             </div>
 
@@ -79,6 +84,10 @@ $mysqli->close();
                         echo "<p><strong>Категория:</strong> " . htmlspecialchars($related_product['category_name'], ENT_QUOTES, 'UTF-8') . "</p>";
                         echo "<p><strong>Описание:</strong> " . htmlspecialchars($related_product['description'], ENT_QUOTES, 'UTF-8') . "</p>";
                         echo "<p><strong>Цена:</strong> " . number_format($related_product['price'], 2, '.', '') . " грн</p>";
+                        echo "<p><strong>Размер:</strong> " . htmlspecialchars($related_product['size'], ENT_QUOTES, 'UTF-8') . "</p>";
+                        echo "<p><strong>Наличие:</strong> " . ($related_product['availability'] ? 'В наличии' : 'Нет в наличии') . "</p>";
+                        echo "<p><strong>Количество на складе:</strong> " . $related_product['quantity_in_stock'] . "</p>";
+                        echo "<p><strong>Вес:</strong> " . $related_product['weight'] . " кг</p>";
                         echo "<img src='" . $related_product['image'] . "' alt='" . htmlspecialchars($related_product['name'], ENT_QUOTES, 'UTF-8') . "' />";
                         echo "</div>";
                     }
