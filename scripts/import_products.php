@@ -47,8 +47,6 @@ foreach ($xml->shop->categories->category as $category) {
     }
 }
 
-
-
 // === 2. ДОБАВЛЕНИЕ ТОВАРОВ ===
 foreach ($xml->shop->offers->offer as $offer) {
     $product_id = (int)$offer['id'];
@@ -57,14 +55,29 @@ foreach ($xml->shop->offers->offer as $offer) {
     $description = $mysqli->real_escape_string($offer->description);
     $price = (float)$offer->price;
     $image = $mysqli->real_escape_string($offer->picture);
-    
+
+    // Извлекаем дополнительные параметры
+    $availability = ($offer->available == 'true') ? 1 : 0; // Наличие товара
+    $quantity_in_stock = (int)$offer->quantity_in_stock; // Количество на складе
+    $weight = (float)$offer->weight; // Вес товара
+
+    // Извлекаем размер из тега <param name="Размер">
+    $size = '';
+    foreach ($offer->param as $param) {
+        if ((string)$param['name'] == 'Размер') {
+            $size = $mysqli->real_escape_string((string)$param); // Сохраняем размер
+            break;
+        }
+    }
+
     // Проверяем, есть ли товар в базе
     $checkQuery = "SELECT id FROM products WHERE id = $product_id";
     $result = $mysqli->query($checkQuery);
 
     if ($result->num_rows == 0) {
-        $mysqli->query("INSERT INTO products (id, category_id, name, description, price, image) 
-                        VALUES ($product_id, $category_id, '$name', '$description', $price, '$image')");
+        // Вставляем новый товар с дополнительными параметрами
+        $mysqli->query("INSERT INTO products (id, category_id, name, description, price, image, size, availability, quantity_in_stock, weight) 
+                        VALUES ($product_id, $category_id, '$name', '$description', $price, '$image', '$size', $availability, $quantity_in_stock, $weight)");
     }
 }
 
