@@ -21,16 +21,33 @@ if ($mysqli->connect_error) {
 // === 1. ДОБАВЛЕНИЕ КАТЕГОРИЙ ===
 foreach ($xml->shop->categories->category as $category) {
     $category_id = (int)$category['id'];
-    $category_name = $mysqli->real_escape_string($category);
+    $category_name = $mysqli->real_escape_string((string)$category);
+    $parent_id = (int)$category['parentId']; // Получаем родительскую категорию
+
+    // Проверяем, есть ли родительская категория в базе
+    if ($parent_id != 0) {
+        $checkParentQuery = "SELECT id FROM categories WHERE id = $parent_id";
+        $parentResult = $mysqli->query($checkParentQuery);
+
+        // Если родительская категория не существует, добавляем её
+        if ($parentResult->num_rows == 0) {
+            // Допустим, вы хотите добавить родительскую категорию с названием "Неизвестная категория"
+            $parentCategoryName = 'Неизвестная категория'; // Можно взять это из XML, если оно присутствует
+            $mysqli->query("INSERT INTO categories (id, name, parent_id) VALUES ($parent_id, '$parentCategoryName', NULL)");
+        }
+    }
 
     // Проверяем, есть ли категория в базе
     $checkQuery = "SELECT id FROM categories WHERE id = $category_id";
     $result = $mysqli->query($checkQuery);
 
     if ($result->num_rows == 0) {
-        $mysqli->query("INSERT INTO categories (id, name) VALUES ($category_id, '$category_name')");
+        // Вставляем новую категорию с родительским идентификатором
+        $mysqli->query("INSERT INTO categories (id, name, parent_id) VALUES ($category_id, '$category_name', $parent_id)");
     }
 }
+
+
 
 // === 2. ДОБАВЛЕНИЕ ТОВАРОВ ===
 foreach ($xml->shop->offers->offer as $offer) {
