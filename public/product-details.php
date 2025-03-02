@@ -31,10 +31,11 @@ if ($result->num_rows > 0) {
 // Получаем все товары с таким же именем из других подкатегорий
 $product_name = $product['name']; // Извлекаем имя товара
 $parent_id = $product['parent_id']; // Получаем parent_id текущей категории товара
-$related_query = "SELECT * FROM products 
-                  WHERE name = '$product_name' 
-                  AND category_id IN (SELECT id FROM categories WHERE parent_id = $parent_id) 
-                  AND id != $product_id"; // Исключаем текущий товар
+$related_query = "SELECT products.*, categories.name AS category_name FROM products 
+                  JOIN categories ON products.category_id = categories.id 
+                  WHERE products.name = '$product_name' 
+                  AND categories.parent_id = $parent_id 
+                  AND products.id != $product_id"; // Исключаем текущий товар
 $related_result = $mysqli->query($related_query);
 
 // Закрытие соединения с базой данных
@@ -60,23 +61,25 @@ $mysqli->close();
             <h2>Подробнее о товаре</h2>
             <div class="product">
                 <h3><?php echo htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8'); ?></h3>
-                <p><strong>Категория:</strong> <?php echo htmlspecialchars($product['category_name'], ENT_QUOTES, 'UTF-8'); ?></p>
+                <p><strong>Категория:</strong> <?php echo isset($product['category_name']) ? htmlspecialchars($product['category_name'], ENT_QUOTES, 'UTF-8') : 'Категория не найдена'; ?></p>
                 <p><strong>Описание:</strong> <?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></p>
                 <p><strong>Цена:</strong> <?php echo number_format($product['price'], 2, '.', '') . " грн"; ?></p>
                 <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8'); ?>" />
             </div>
 
-            <!-- Товары с таким же именем из других подкатегорий -->
+            <!-- Похожие товары -->
             <h3>Похожие товары</h3>
             <div class="related-products">
                 <?php
                 if ($related_result->num_rows > 0) {
                     while ($related_product = $related_result->fetch_assoc()) {
+                        // Используем такую же верстку для похожих товаров
                         echo "<div class='product'>";
-                        echo "<h4>" . htmlspecialchars($related_product['name'], ENT_QUOTES, 'UTF-8') . "</h4>";
-                        echo "<p>Цена: " . number_format($related_product['price'], 2, '.', '') . " грн</p>";
+                        echo "<h3>" . htmlspecialchars($related_product['name'], ENT_QUOTES, 'UTF-8') . "</h3>";
+                        echo "<p><strong>Категория:</strong> " . htmlspecialchars($related_product['category_name'], ENT_QUOTES, 'UTF-8') . "</p>";
+                        echo "<p><strong>Описание:</strong> " . htmlspecialchars($related_product['description'], ENT_QUOTES, 'UTF-8') . "</p>";
+                        echo "<p><strong>Цена:</strong> " . number_format($related_product['price'], 2, '.', '') . " грн</p>";
                         echo "<img src='" . $related_product['image'] . "' alt='" . htmlspecialchars($related_product['name'], ENT_QUOTES, 'UTF-8') . "' />";
-                        echo "<a href='/myshop/public/product-details.php?id=" . $related_product['id'] . "' class='btn'>Подробнее</a>";
                         echo "</div>";
                     }
                 } else {
