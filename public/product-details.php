@@ -22,11 +22,12 @@ $result = $mysqli->query($query);
 
 if ($result->num_rows > 0) {
     $product = $result->fetch_assoc();
-    $product_name = $product['name'];
+    $product_name = $mysqli->real_escape_string($product['name']);
     $parent_id = $product['parent_id'];
 
     // Получаем все товары с таким же именем и parent_id
-    $sizes_query = "SELECT products.id, products.size, products.price FROM products 
+    $sizes_query = "SELECT products.id, products.size, products.price, products.availability, products.quantity_in_stock 
+                    FROM products 
                     JOIN categories ON products.category_id = categories.id 
                     WHERE products.name = '$product_name' 
                     AND categories.parent_id = $parent_id";
@@ -53,8 +54,14 @@ $mysqli->close();
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/product-details.css">
     <script>
-        function updatePrice(price) {
+        function updatePrice(select) {
+            const price = select.options[select.selectedIndex].getAttribute('data-price');
+            const availability = select.options[select.selectedIndex].getAttribute('data-availability');
+            const stock = select.options[select.selectedIndex].getAttribute('data-stock');
+            
             document.getElementById('price').innerText = price + ' грн';
+            document.getElementById('availability').innerText = availability === '1' ? 'В наличии' : 'Нет в наличии';
+            document.getElementById('stock').innerText = stock;
         }
     </script>
 </head>
@@ -68,12 +75,17 @@ $mysqli->close();
                 <p><strong>Категория:</strong> <?php echo htmlspecialchars($product['category_name'], ENT_QUOTES, 'UTF-8'); ?></p>
                 <p><strong>Описание:</strong> <?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></p>
                 <p><strong>Цена:</strong> <span id="price"><?php echo number_format($product['price'], 2, '.', ''); ?> грн</span></p>
+                <p><strong>Наличие:</strong> <span id="availability"><?php echo $product['availability'] ? 'В наличии' : 'Нет в наличии'; ?></span></p>
+                <p><strong>Количество на складе:</strong> <span id="stock"><?php echo $product['quantity_in_stock']; ?></span></p>
                 <img src="<?php echo htmlspecialchars($product['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8'); ?>">
                 <form action="cart.php" method="post">
                     <label for="size">Выберите размер:</label>
-                    <select name="size" id="size" onchange="updatePrice(this.options[this.selectedIndex].getAttribute('data-price'))">
+                    <select name="size" id="size" onchange="updatePrice(this)">
                         <?php foreach ($sizes as $size) : ?>
-                            <option value="<?php echo htmlspecialchars($size['size'], ENT_QUOTES, 'UTF-8'); ?>" data-price="<?php echo number_format($size['price'], 2, '.', ''); ?>">
+                            <option value="<?php echo htmlspecialchars($size['size'], ENT_QUOTES, 'UTF-8'); ?>" 
+                                    data-price="<?php echo number_format($size['price'], 2, '.', ''); ?>" 
+                                    data-availability="<?php echo $size['availability']; ?>" 
+                                    data-stock="<?php echo $size['quantity_in_stock']; ?>">
                                 <?php echo htmlspecialchars($size['size'], ENT_QUOTES, 'UTF-8'); ?>
                             </option>
                         <?php endforeach; ?>
