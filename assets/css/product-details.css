@@ -41,3 +41,52 @@
   margin-top: 10px;
   border: 1px solid #ccc;
 }
+
+.size-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.size-group {
+  display: flex;
+  gap: 10px;
+}
+
+.size-btn {
+  padding: 10px 20px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  display: inline-block;
+  transition: 0.3s;
+  text-align: center;
+  background-color: #f4f4f4;
+}
+
+.size-btn.active {
+  background: #333;
+  color: white;
+  border: 1px solid #333;
+}
+
+/* Кнопки для выбора размера 50*70 и 70*70 */
+.size-btn-group {
+  padding: 10px 20px;
+  margin: 5px;
+  border-radius: 4px;
+  background-color: #f4f4f4;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.size-btn-group.active {
+  background-color: #333;
+  color: white;
+  border: 1px solid #333;
+}
+
+.btn-container {
+  margin-bottom: 20px;
+}

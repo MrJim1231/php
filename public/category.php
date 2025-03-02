@@ -74,7 +74,7 @@ $category = $category_result->fetch_assoc();
                     echo "<p>" . htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8') . "</p>";
                     echo "<p>Цена: " . number_format($product['price'], 2, '.', '') . " грн</p>";
                     echo "<img src='" . $product['image'] . "' alt='" . htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8') . "' />";
-                    echo "<a href='/myshop/public/product-details.php?id=" . $product['id'] . "' class='btn'>Подробнее</a>";
+                    echo "<a href='/myshop/public/product-page.php?id=" . $product['id'] . "' class='btn'>Подробнее</a>";
                     echo "</div>";
                 }
 
