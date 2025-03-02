@@ -14,7 +14,7 @@ if ($mysqli->connect_error) {
 $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
 // Получаем информацию о товаре
-$query = "SELECT products.*, categories.name AS category_name FROM products
+$query = "SELECT products.*, categories.name AS category_name, categories.parent_id FROM products
           JOIN categories ON products.category_id = categories.id
           WHERE products.id = $product_id";
 $result = $mysqli->query($query);
@@ -27,6 +27,15 @@ if ($result->num_rows > 0) {
     echo "<p>Товар не найден</p>";
     exit;
 }
+
+// Получаем все товары с таким же именем из других подкатегорий
+$product_name = $product['name']; // Извлекаем имя товара
+$parent_id = $product['parent_id']; // Получаем parent_id текущей категории товара
+$related_query = "SELECT * FROM products 
+                  WHERE name = '$product_name' 
+                  AND category_id IN (SELECT id FROM categories WHERE parent_id = $parent_id) 
+                  AND id != $product_id"; // Исключаем текущий товар
+$related_result = $mysqli->query($related_query);
 
 // Закрытие соединения с базой данных
 $mysqli->close();
@@ -55,6 +64,25 @@ $mysqli->close();
                 <p><strong>Описание:</strong> <?php echo htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8'); ?></p>
                 <p><strong>Цена:</strong> <?php echo number_format($product['price'], 2, '.', '') . " грн"; ?></p>
                 <img src="<?php echo $product['image']; ?>" alt="<?php echo htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8'); ?>" />
+            </div>
+
+            <!-- Товары с таким же именем из других подкатегорий -->
+            <h3>Похожие товары</h3>
+            <div class="related-products">
+                <?php
+                if ($related_result->num_rows > 0) {
+                    while ($related_product = $related_result->fetch_assoc()) {
+                        echo "<div class='product'>";
+                        echo "<h4>" . htmlspecialchars($related_product['name'], ENT_QUOTES, 'UTF-8') . "</h4>";
+                        echo "<p>Цена: " . number_format($related_product['price'], 2, '.', '') . " грн</p>";
+                        echo "<img src='" . $related_product['image'] . "' alt='" . htmlspecialchars($related_product['name'], ENT_QUOTES, 'UTF-8') . "' />";
+                        echo "<a href='/myshop/public/product-details.php?id=" . $related_product['id'] . "' class='btn'>Подробнее</a>";
+                        echo "</div>";
+                    }
+                } else {
+                    echo "<p>Нет похожих товаров.</p>";
+                }
+                ?>
             </div>
         </section>
     </main>
