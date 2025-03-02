@@ -44,7 +44,8 @@
 
 .size-groups {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: center;
   gap: 10px;
 }
 
@@ -62,6 +63,7 @@
   transition: 0.3s;
   text-align: center;
   background-color: #f4f4f4;
+  border-radius: 4px;
 }
 
 .size-btn.active {
@@ -74,6 +76,7 @@
 .size-btn-group {
   padding: 10px 20px;
   margin: 5px;
+  border: 1px solid #ccc; /* Тонкая граница */
   border-radius: 4px;
   background-color: #f4f4f4;
   cursor: pointer;
