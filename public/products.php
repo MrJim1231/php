@@ -27,7 +27,9 @@
                     die("Ошибка подключения: " . $mysqli->connect_error);
                 }
 
-                $query = "SELECT * FROM products LIMIT 6";
+                $query = "SELECT products.*, categories.name AS category_name FROM products
+                          JOIN categories ON products.category_id = categories.id
+                          LIMIT 6";
                 $result = $mysqli->query($query);
 
                 if ($result->num_rows > 0) {
@@ -36,6 +38,7 @@
                         echo "<h3>" . htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8') . "</h3>";
                         echo "<p>" . htmlspecialchars($product['description'], ENT_QUOTES, 'UTF-8') . "</p>";
                         echo "<p>Цена: " . number_format($product['price'], 2, '.', '') . " грн</p>";
+                        echo "<p>Категория: " . htmlspecialchars($product['category_name'], ENT_QUOTES, 'UTF-8') . "</p>";
                         echo "<img src='" . $product['image'] . "' alt='" . htmlspecialchars($product['name'], ENT_QUOTES, 'UTF-8') . "' />";
                         echo "<a href='/product-details.php?id=" . $product['id'] . "' class='btn'>Подробнее</a>";
                         echo "</div>";

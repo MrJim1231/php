@@ -34,7 +34,7 @@
                         echo "<h3>" . htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8') . "</h3>";
                         echo "<p>" . htmlspecialchars($category['description'], ENT_QUOTES, 'UTF-8') . "</p>";
                         echo "<img src='" . $category['image'] . "' alt='" . htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8') . "' />";
-                        echo "<a href='/category.php?id=" . $category['id'] . "' class='btn'>Смотреть товары</a>";
+                        echo "<a href='/myshop/public/category.php?id=" . $category['id'] . "' class='btn'>Смотреть товары</a>";
                         echo "</div>";
                     }
                 } else {
