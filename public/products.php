@@ -14,13 +14,34 @@
 
     <!-- Основной контент -->
     <main>
+        <!-- Секция с количеством товаров -->
+        <section class="product-count">
+            <?php
+            include('../config.php');
+
+            $mysqli = new mysqli(DB_HOSTNAME, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
+
+            if ($mysqli->connect_error) {
+                die("Ошибка подключения: " . $mysqli->connect_error);
+            }
+
+            // Запрос для подсчета всех товаров
+            $countQuery = "SELECT COUNT(*) AS total_products FROM products";
+            $countResult = $mysqli->query($countQuery);
+            $totalProducts = $countResult->fetch_assoc()['total_products'];
+
+            echo "<h1>Всего товаров в магазине: $totalProducts</h1>";
+
+            $mysqli->close();
+            ?>
+        </section>
+
         <!-- Секция с продуктами -->
         <section class="featured-products">
             <h2>Рекомендуемые товары</h2>
             <div class="products-list">
                 <?php
-                include('../config.php');
-
+                // Повторно подключаемся к базе данных для получения продуктов
                 $mysqli = new mysqli(DB_HOSTNAME, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
 
                 if ($mysqli->connect_error) {
